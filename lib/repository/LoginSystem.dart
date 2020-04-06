@@ -181,9 +181,9 @@ class LoginSystem<T extends UserModel> {
     controller.close();
   }
 
-  Future<String> updateUser(UserModel model, [String customUid]) async {
+  Future<String> updateUser(UserModel model) async {
     if (!await model.validateData()) throw "Invalid Data!";
-    return await repository.update(model, customUid ?? _fbUser.uid);
+    return await repository.update(model);
   }
 }
 
