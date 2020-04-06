@@ -8,14 +8,14 @@ environment:
   sdk: ">=2.1.0 <3.0.0"
 
 dependencies:
-  flutter:
-    sdk: flutter
-
-dev_dependencies:
   firebase_auth:
   firebase_database: 
   Repository:
     git: https://github.com/GB0307/FlutterRepository.git
+  flutter:
+    sdk: flutter 
+
+dev_dependencies:
   flutter_test:
     sdk: flutter
 

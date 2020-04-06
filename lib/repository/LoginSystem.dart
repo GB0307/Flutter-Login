@@ -1,20 +1,20 @@
 import 'dart:async';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
 import '../LoginSystem.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
 
 // This class should implement main features for FirebaseAuth and link them with Firebase database
 // The goal is to make it abstract, so we can reuse it
 
 typedef InvalidHandler<T> = T Function(T user);
 typedef AuthEvent<T extends UserModel> = void Function(T oldUser, T newUser);
+typedef UserBuilder<T> = T Function(FirebaseUser user, Map data);
 
 class LoginSystem<T extends UserModel> {
-  LoginSystem(String usersPath,
-      {@required UserBuilder<T> userBuilder,
+  LoginSystem(this.usersPath,
+      {@required this.userBuilder,
       String uid = "",
       InvalidHandler<T> onUserInvalid,
       this.onLogIn,
@@ -22,11 +22,7 @@ class LoginSystem<T extends UserModel> {
       this.onUserChanged,
       this.waitTimeout = const Duration(seconds: 3),
       this.loginTimeout = const Duration(seconds: 3)})
-      : repository = new UserDataRepository(
-          usersPath,
-          userBuilder,
-        ),
-        _onUserInvalid = onUserInvalid;
+      : _onUserInvalid = onUserInvalid;
 
   T _user;
   T get currentUser => _user;
@@ -34,14 +30,17 @@ class LoginSystem<T extends UserModel> {
   FirebaseUser _fbUser;
   FirebaseUser get fbUser => _fbUser;
 
+  final String usersPath;
+
   // Callbacks
   final InvalidHandler<T> _onUserInvalid;
   final AuthEvent<T> onLogIn;
   final AuthEvent<T> onLogOut;
   final AuthEvent<T> onUserChanged;
+  final UserBuilder<T> userBuilder;
 
   // Repository Variables
-  final UserDataRepository<T> repository;
+  UserDataRepository<T> repository;
 
   // Timeouts
   final Duration loginTimeout;
@@ -61,6 +60,10 @@ class LoginSystem<T extends UserModel> {
   StreamSubscription<T> repoListener;
 
   void init() {
+    repository = new UserDataRepository(
+      usersPath,
+      onUserBuildRequest,
+    );
     // Init the auth listener, so it can receive the current user
     if (authListener != null) {
       authListener.cancel();
@@ -76,6 +79,10 @@ class LoginSystem<T extends UserModel> {
     });
   }
 
+  T onUserBuildRequest(Map map) {
+    return userBuilder(_fbUser, map);
+  }
+
   @protected
   void onUserReceived(FirebaseUser user) async {
     print("User Received: " + (user == null ? "null" : user.uid));
@@ -85,9 +92,9 @@ class LoginSystem<T extends UserModel> {
         (user != null && currentUser != null && user.uid == currentUser.uid)) {
       print("USER LOGGED IN");
       repository.changeSubPath(user.uid);
-      var model = await _buildModel(user);
 
       _fbUser = user;
+      var model = await _buildModel(user);
       setUser(model);
     }
 
@@ -109,9 +116,6 @@ class LoginSystem<T extends UserModel> {
           repository.currentData ??
           await repository.stream.first.timeout(waitTimeout) ??
           repository.currentData;
-
-    // set the user if the model isn't null
-    if (model != null) model.setUser(user);
 
     // call invalid user handler if the data is invalid and there is a callback
     if (_onUserInvalid != null &&
@@ -175,6 +179,11 @@ class LoginSystem<T extends UserModel> {
     _disableListeners();
     repository.dispose();
     controller.close();
+  }
+
+  Future<String> updateUser(UserModel model, [String customUid]) async {
+    if (!await model.validateData()) throw "Invalid Data!";
+    return await repository.update(model, customUid ?? _fbUser.uid);
   }
 }
 

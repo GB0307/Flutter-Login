@@ -2,21 +2,13 @@ import 'package:Repository/Repository.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 abstract class UserModel extends DBModel {
-  String _uid;
-  String get uid => _uid;
+  String get uid => key;
 
-  FirebaseUser _fbUser;
-  FirebaseUser get firebaseUser => _fbUser;
+  final FirebaseUser firebaseUser;
 
-  UserModel.fromMap(String userPath, Map rawData)
-      : super.fromMap(userPath, "", rawData);
+  UserModel.fromMap(String userPath, this.firebaseUser, Map rawData)
+      : 
+        super.fromMap(userPath, firebaseUser.uid, rawData);
 
   Future<bool> validateData();
-
-  void setUser(FirebaseUser user) {
-    if (user != null && _fbUser == null) {
-      _fbUser = user;
-      _uid = user.uid;
-    }
-  }
 }
