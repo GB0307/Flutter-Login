@@ -123,7 +123,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "2302a43580b794e727bd303e63bcca692e993154"
+      resolved-ref: f13348a40c787953e506bf6b47f8d47263d3c258
       url: "https://github.com/GB0307/FlutterRepository.git"
     source: git
     version: "0.0.1"

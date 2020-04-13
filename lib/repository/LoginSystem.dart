@@ -119,7 +119,7 @@ class LoginSystem<T extends UserModel> {
 
     // call invalid user handler if the data is invalid and there is a callback
     if (_onUserInvalid != null &&
-        (model == null || !await model.validateData()))
+        (model == null || !await model.validateModel()))
       model = _onUserInvalid(model);
 
     return model;
@@ -128,7 +128,7 @@ class LoginSystem<T extends UserModel> {
   void setUser(UserModel model) async {
     // check if it still invalid, if it is, log out
     T old = currentUser;
-    if (model == null || !await model.validateData()) {
+    if (model == null || !await model.validateModel()) {
       if (_fbUser != null) auth.signOut();
       model = null;
       _user = null;
@@ -182,7 +182,7 @@ class LoginSystem<T extends UserModel> {
   }
 
   Future<String> updateUser(UserModel model) async {
-    if (!await model.validateData()) throw "Invalid Data!";
+    if (!await model.validateModel()) throw "Invalid Data!";
     return await repository.update(model);
   }
 }

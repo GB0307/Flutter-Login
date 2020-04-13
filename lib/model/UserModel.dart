@@ -9,6 +9,4 @@ abstract class UserModel extends DBModel {
   UserModel.fromMap(String userPath, this.firebaseUser, Map rawData)
       : 
         super.fromMap(userPath, firebaseUser.uid, rawData);
-
-  Future<bool> validateData();
 }
