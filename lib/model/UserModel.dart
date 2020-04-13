@@ -1,4 +1,4 @@
-import 'package:Repository/Repository.dart';
+import 'package:flutter_repository/flutter_repository.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 abstract class UserModel extends DBModel {

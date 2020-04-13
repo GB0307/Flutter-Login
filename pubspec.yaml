@@ -10,7 +10,7 @@ environment:
 dependencies:
   firebase_auth:
   firebase_database: 
-  Repository:
+  flutter_repository:
     git: https://github.com/GB0307/FlutterRepository.git
   flutter:
     sdk: flutter 

@@ -1,7 +1,5 @@
-import 'package:firebase_auth/firebase_auth.dart';
-
+import 'package:flutter_repository/flutter_repository.dart';
 import '../LoginSystem.dart';
-import 'package:Repository/Repository.dart';
 
 
 typedef UserBuildCallback<T> = T Function(Map data);
